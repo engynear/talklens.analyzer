@@ -41,7 +41,7 @@ class LocalLLM(LLMInterface):
             )
 
             decoded = self.tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
-            print(f"🧠 Попытка
+            print(f"🧠 Попытка #{attempt + 1} получения ответа")
             return decoded
             
         return ""
@@ -135,7 +135,7 @@ class LocalLLM(LLMInterface):
 
             decoded = self.tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
 
-            print(f"🧠 Попытка
+            print(f"🧠 Попытка #{attempt + 1} получения JSON")
 
             try:
                 json_text = re.search(r"\{.*\}", decoded, re.DOTALL).group()
