@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Kafka settings
-KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
+KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:29092")
 KAFKA_TOPIC = os.getenv("KAFKA_TOPIC", "telegram-messages")
 
 # Batching settings
@@ -21,7 +21,7 @@ YANDEX_API = os.getenv("YANDEX_API", "false").lower() == "true"
 FOLDER_ID = os.getenv("FOLDER_ID", "")
 
 # Database settings - используем стандартные переменные Postgres
-DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
+DB_HOST = os.getenv("POSTGRES_HOST", "postgres")
 DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 DB_NAME = os.getenv("POSTGRES_DB", "talklens")
 DB_USER = os.getenv("POSTGRES_USER", "postgres")
