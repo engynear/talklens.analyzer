@@ -5,21 +5,12 @@ from typing import List, Dict, Any, Optional
 from yandex_cloud_ml_sdk import YCloudML
 
 from .llm_interface import LLMInterface
-from .prompts import (
-    compliments_prompt,
-    engagement_prompt,
-    attachment_prompt,
-    recommendations_prompt,
-    summary_prompt,
-    legacy_analysis_prompt
-)
 from .yandex_prompts import (
     compliments_messages,
     engagement_messages,
     attachment_messages,
     recommendations_messages,
-    summary_messages,
-    legacy_analysis_messages
+    summary_messages
 )
 
 class ApiLLM(LLMInterface):
