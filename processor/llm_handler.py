@@ -1,13 +1,10 @@
 from .llm_factory import LLMFactory
-from config import USE_API, API_URL, API_KEY, YANDEX_API, FOLDER_ID
+from config import API_KEY, FOLDER_ID
 
 
 llm = LLMFactory.create_llm(
-    use_api=USE_API,
-    api_url=API_URL,
     api_key=API_KEY,
-    folder_id=FOLDER_ID,
-    yandex_api=YANDEX_API
+    folder_id=FOLDER_ID
 )
 
 
@@ -25,9 +22,4 @@ def generate_recommendations(messages, historical_summary="", user_id="", max_re
 
 def update_summary(messages, historical_summary=None, max_retries=3):
     return llm.update_summary(messages, historical_summary, max_retries)
-def analyze_batch(messages, max_retries=3):
-    """
-    Устаревший метод, оставлен для обратной совместимости
-    """
-    return llm.analyze_batch(messages, max_retries)
 

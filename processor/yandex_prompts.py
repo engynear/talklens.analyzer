@@ -1,9 +1,4 @@
-"""
-Модуль содержит промпты для запросов к YandexGPT API
-Формат сообщений Yandex GPT отличается от Mistral
-"""
 from typing import List, Dict, Any, Optional
-
 
 def create_yandex_messages(system_prompt: str, user_content: str) -> List[Dict[str, str]]:
     """
@@ -27,7 +22,6 @@ def create_yandex_messages(system_prompt: str, user_content: str) -> List[Dict[s
         }
     ]
 
-
 def compliments_messages(chat_text: str) -> List[Dict[str, str]]:
     """Сообщения для подсчета комплиментов"""
     system_prompt = (
@@ -42,7 +36,6 @@ def compliments_messages(chat_text: str) -> List[Dict[str, str]]:
     user_content = f"Чат:\n{chat_text}\n\nПример ответа: {{\"123\": 3, \"456\": 1}}"
     
     return create_yandex_messages(system_prompt, user_content)
-
 
 def engagement_messages(chat_text: str, user_ids: list, historical_summary: str = "", previous_engagement: dict = None) -> list:
     """Сообщения для определения уровня вовлеченности"""
@@ -70,7 +63,6 @@ def engagement_messages(chat_text: str, user_ids: list, historical_summary: str 
         {"role": "system", "text": system_prompt},
         {"role": "user", "text": user_content}
     ]
-
 
 def attachment_messages(chat_text: str, user_ids: list, historical_summary: str = "", previous_attachments: dict = None) -> list:
     system_prompt = (
@@ -117,7 +109,6 @@ def attachment_messages(chat_text: str, user_ids: list, historical_summary: str 
         {"role": "user", "text": user_content}
     ]
 
-
 def recommendations_messages(chat_text: str, historical_summary: str, user_id: str) -> List[Dict[str, str]]:
     """Сообщения для генерации рекомендаций"""
     system_prompt = (
@@ -143,7 +134,6 @@ def recommendations_messages(chat_text: str, historical_summary: str, user_id: s
     
     return create_yandex_messages(system_prompt, user_content)
 
-
 def summary_messages(chat_text: str, historical_summary: str = "") -> List[Dict[str, str]]:
     """Сообщения для обновления саммери"""
     system_prompt = '''Ты — аналитик диалогов. Твоя задача - точно и объективно резюмировать содержание сообщений.
@@ -166,14 +156,12 @@ def summary_messages(chat_text: str, historical_summary: str = "") -> List[Dict[
     
     return create_yandex_messages(system_prompt, user_content)
 
-
 def legacy_analysis_messages(chat_text: str) -> List[Dict[str, str]]:
     """Устаревшие сообщения для анализа батча (обратная совместимость)"""
     system_prompt = "Проанализируй чат и оцени: сколько комплиментов сделал каждый собеседник и какой уровень вовлечённости у каждого (от 0 до 100). Ответ дай строго в формате JSON."
     user_content = f"Чат:\n{chat_text}\n\nПример ответа: {{\"A\": {{\"compliments\": 3, \"engagement_score\": 82.5}}, \"B\": {{\"compliments\": 1, \"engagement_score\": 67.0}}}}"
     
     return create_yandex_messages(system_prompt, user_content)
-
 
 def update_summary(messages: List[Dict[str, Any]], historical_summary: Optional[str] = None) -> str:
     """

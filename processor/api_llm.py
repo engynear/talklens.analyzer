@@ -499,138 +499,20 @@ class ApiLLM(LLMInterface):
         max_retries: int = 3
     ) -> str:
         """
-        Обновляет саммери диалога
+        Обновляет историческое саммери на основе нового батча сообщений
         
         Args:
             messages: Список сообщений для анализа
-            historical_summary: Предыдущее историческое саммери
-            max_retries: Максимальное количество попыток
+            historical_summary: Предыдущее историческое саммери диалога (если есть)
+            max_retries: Максимальное количество попыток анализа
             
         Returns:
-            Обновленное саммери
+            Строка с обновленным саммери или None в случае ошибки
         """
-        print(f"🔄 Запрос на обновление саммери для {len(messages)} сообщений")
-        
-
-        if not messages:
-            print("⚠️ Пустой список сообщений для обновления саммери")
-            return historical_summary or ""
-            
         chat_text = self._format_messages(messages)
         yandex_messages = summary_messages(chat_text, historical_summary)
-        
-        for attempt in range(max_retries):
-            try:
-                response = self._make_request(yandex_messages, max_retries=1)
-                
-
-                if not response:
-                    print(f"⚠️ Пустой ответ при обновлении саммери (попытка {attempt+1}/{max_retries})")
-                    time.sleep(1 + attempt)
-                    continue
-                
-
-                clean_response = self._clean_markdown(response)
-                
-
-                if self._contains_prohibited_content(clean_response):
-                    print(f"⚠️ Обнаружен запрещенный контент в саммери (попытка {attempt+1}/{max_retries})")
-                    
-
-                    if attempt == max_retries - 1:
-                        print("⚠️ Не удалось получить саммери без запрещенного контента")
-                        return historical_summary or ""
-                    
-
-                    repair_prompt = f"""Пожалуйста, резюмируй следующий диалог коротко и лаконично.
-
-Диалог:
-{chat_text}
-
-СТРОГО запрещено в твоем ответе:
-1. Любые ссылки на поиск или сайты
-2. Фразы типа "посмотрите в поиске", "в интернете есть информация" и подобные
-3. Упоминание поисковых систем или интернета
-4. Любые HTML или Markdown ссылки
-5. Упоминание, что ты не можешь помочь
-
-Твой предыдущий ответ содержал запрещенный контент. Просто дай краткое резюме диалога ТОЛЬКО на основе предоставленного текста."""
-                    
-                    yandex_messages = [
-                        {"role": "system", "text": "Ты аналитик, составляющий резюме диалогов."},
-                        {"role": "user", "text": repair_prompt}
-                    ]
-                    time.sleep(1 + attempt)
-                    continue
-                
-                summary_preview = clean_response[:150] + "..." if len(clean_response) > 150 else clean_response
-                print(f"✅ Обновлено саммери длиной {len(clean_response)} символов")
-                print(f"📝 Начало саммери: {summary_preview}")
-                return clean_response
-                
-            except Exception as e:
-                print(f"❌ Ошибка при обновлении саммери (попытка {attempt+1}/{max_retries}): {e}")
-                import traceback
-                print(f"Стек ошибки:\n{traceback.format_exc()}")
-                
-                if attempt == max_retries - 1:
-                    print("⚠️ Не удалось обновить саммери после всех попыток")
-                    return historical_summary or ""
-                
-                time.sleep(1 + attempt)
-        
-
-        return historical_summary or ""
-        
-    def _contains_prohibited_content(self, text: str) -> bool:
-        """
-        Проверяет текст на наличие запрещенного контента
-        
-        Args:
-            text: Текст для проверки
-            
-        Returns:
-            True если содержит запрещенный контент, иначе False
-        """
-
-        link_patterns = [
-            r'\[.*?\]\(.*?\)',
-            r'https?://\S+',
-            r'www\.\S+',
-            r'ya\.ru',
-            r'yandex\.ru',
-            r'google\.com',
-            r'в поиске',
-            r'в интернете',
-            r'посмотрите'
-        ]
-        
-
-        for pattern in link_patterns:
-            if re.search(pattern, text, re.IGNORECASE):
-                print(f"⚠️ Обнаружен запрещенный контент по паттерну: {pattern}")
-                return True
-                
-        return False
-
-    def analyze_batch(self, messages: List[Dict[str, Any]], max_retries: int = 3) -> Dict[str, Any]:
-        """
-        Выполняет анализ батча сообщений (устаревший метод)
-        
-        Args:
-            messages: Список сообщений для анализа
-            max_retries: Максимальное количество попыток
-            
-        Returns:
-            Dict с результатами анализа или None в случае ошибки
-        """
-        print(f"🔄 Устаревший запрос анализа батча для {len(messages)} сообщений")
-        chat_text = self._format_messages(messages)
-        yandex_messages = legacy_analysis_messages(chat_text)
         response = self._make_request(yandex_messages, max_retries)
-        result = self._extract_json(response)
-        print(f"✅ Результат анализа батча: {result}")
-        return result
+        return response
 
     def get_llm_response(self, prompt: str, max_retries: int = 3) -> str:
         """
@@ -707,3 +589,34 @@ class ApiLLM(LLMInterface):
             
         print("❌ Не удалось получить валидный JSON после всех попыток")
         return {}
+
+    def _contains_prohibited_content(self, text: str) -> bool:
+        """
+        Проверяет текст на наличие запрещенного контента
+        
+        Args:
+            text: Текст для проверки
+            
+        Returns:
+            True если содержит запрещенный контент, иначе False
+        """
+
+        link_patterns = [
+            r'\[.*?\]\(.*?\)',
+            r'https?://\S+',
+            r'www\.\S+',
+            r'ya\.ru',
+            r'yandex\.ru',
+            r'google\.com',
+            r'в поиске',
+            r'в интернете',
+            r'посмотрите'
+        ]
+        
+
+        for pattern in link_patterns:
+            if re.search(pattern, text, re.IGNORECASE):
+                print(f"⚠️ Обнаружен запрещенный контент по паттерну: {pattern}")
+                return True
+                
+        return False

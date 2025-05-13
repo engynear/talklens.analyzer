@@ -5,14 +5,14 @@ class LLMInterface(ABC):
     @abstractmethod
     def count_compliments(self, messages: List[Dict[str, Any]], max_retries: int = 3) -> Dict[str, Any]:
         """
-        Подсчитывает количество комплиментов от обоих участников диалога
+        Подсчитывает количество комплиментов в сообщениях
         
         Args:
             messages: Список сообщений для анализа
             max_retries: Максимальное количество попыток анализа
             
         Returns:
-            Dict с количеством комплиментов или None в случае ошибки
+            Dict с количеством комплиментов для каждого отправителя или None в случае ошибки
         """
         pass
         
@@ -24,7 +24,7 @@ class LLMInterface(ABC):
         max_retries: int = 3
     ) -> Dict[str, Any]:
         """
-        Перерасчитывает уровень вовлеченности каждого участника на основе истории и нового батча
+        Определяет уровень вовлеченности на основе истории и нового батча
         
         Args:
             messages: Список сообщений для анализа
@@ -32,7 +32,7 @@ class LLMInterface(ABC):
             max_retries: Максимальное количество попыток анализа
             
         Returns:
-            Dict с уровнем вовлеченности или None в случае ошибки
+            Dict с уровнем вовлеченности для каждого отправителя или None в случае ошибки
         """
         pass
         
@@ -96,31 +96,4 @@ class LLMInterface(ABC):
         Returns:
             Строка с обновленным саммери или None в случае ошибки
         """
-        pass
-        
-    def analyze_batch(self, messages: List[Dict[str, Any]], max_retries: int = 3) -> Dict[str, Any]:
-        """
-        Устаревший метод анализа батча сообщений, оставлен для обратной совместимости
-        
-        Args:
-            messages: Список сообщений для анализа
-            max_retries: Максимальное количество попыток анализа
-            
-        Returns:
-            Dict с метриками анализа или None в случае ошибки
-        """
-
-        compliments = self.count_compliments(messages, max_retries)
-        engagement = self.calculate_engagement(messages, "", max_retries)
-        
-        if not compliments or not engagement:
-            return None
-            
-        result = {}
-        for user_id in compliments:
-            result[user_id] = {
-                "compliments": compliments[user_id],
-                "engagement_score": engagement.get(user_id, 0)
-            }
-            
-        return result 
+        pass 

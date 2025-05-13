@@ -1,3 +1,4 @@
+import socket
 import asyncio
 from aiokafka import AIOKafkaConsumer
 import json
@@ -9,9 +10,24 @@ from services.analysis_service import analysis_service
 
 async def start_consumer():
     """Асинхронный обработчик сообщений Kafka"""
+    print(f"🔄 Начальное значение KAFKA_BOOTSTRAP_SERVERS: {KAFKA_BOOTSTRAP_SERVERS}")
+    
+    # Получаем IP адрес по имени хоста Docker
+    try:
+        kafka_host, kafka_port = KAFKA_BOOTSTRAP_SERVERS.split(':')
+        print(f"🔄 Попытка получения IP адреса для хоста: {kafka_host}")
+        kafka_ip = socket.gethostbyname(kafka_host)
+        print(f"✅ Получен IP адрес для {kafka_host}: {kafka_ip}")
+        bootstrap_servers = f"{kafka_ip}:{kafka_port}"
+    except Exception as e:
+        print(f"❌ Ошибка получения IP адреса: {e}")
+        print(f"🔄 Используем оригинальное значение: {KAFKA_BOOTSTRAP_SERVERS}")
+        bootstrap_servers = KAFKA_BOOTSTRAP_SERVERS
+    
+    print(f"🔄 Итоговый адрес для подключения: {bootstrap_servers}")
     consumer = AIOKafkaConsumer(
         KAFKA_TOPIC,
-        bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
+        bootstrap_servers=bootstrap_servers,
         group_id='telegram-metrics-group',
         auto_offset_reset='earliest'
     )
@@ -89,4 +105,3 @@ async def metrics_flusher():
 def run():
     """Точка входа для запуска асинхронного Kafka consumer"""
     asyncio.run(start_consumer())
-
