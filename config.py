@@ -13,6 +13,10 @@ BATCH_TIMEOUT_SECONDS = int(os.getenv("BATCH_TIMEOUT_SECONDS", "30"))
 API_KEY = os.getenv("API_KEY", "")
 FOLDER_ID = os.getenv("FOLDER_ID", "")
 
+# Настройки выбора LLM
+LLM_TYPE = os.getenv("LLM_TYPE", "yandex") # "yandex" или "local"
+LOCAL_MODEL_NAME = os.getenv("LOCAL_MODEL_NAME", "models/mistral-instruct") # Имя или путь к локальной модели, если LLM_TYPE="local"
+
 DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
 DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 DB_NAME = os.getenv("POSTGRES_DB", "talklens")

@@ -1,10 +1,12 @@
 from .llm_factory import LLMFactory
-from config import API_KEY, FOLDER_ID
+from config import API_KEY, FOLDER_ID, LLM_TYPE, LOCAL_MODEL_NAME
 
 
 llm = LLMFactory.create_llm(
+    llm_type=LLM_TYPE,
     api_key=API_KEY,
-    folder_id=FOLDER_ID
+    folder_id=FOLDER_ID,
+    local_model_name=LOCAL_MODEL_NAME
 )
 
 
